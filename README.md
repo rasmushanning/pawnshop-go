@@ -1,6 +1,8 @@
 
 # Pawn Shop
 
+[![Tests](https://github.com/rasmushanning/pawnshop-go/actions/workflows/test.yml/badge.svg)](https://github.com/rasmushanning/pawnshop-go/actions/workflows/test.yml) [![CI](https://github.com/rasmushanning/pawnshop-go/actions/workflows/ci.yml/badge.svg)](https://github.com/rasmushanning/pawnshop-go/actions/workflows/ci.yml)
+
 <p align="center">
   <img style="border: 5px solid white; border-radius: 10px;" src="./assets/pawnshop.png" />
 </p>
