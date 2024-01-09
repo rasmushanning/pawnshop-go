@@ -20,6 +20,7 @@ A lightweight client was also created mainly to be used in the end-to-end tests.
 ## Directory structure
 
 ```
+├── assets - any asset related to the server or repository in any way, i.e. images or text files.
 ├── endtoend_tests - contains a test suite that satisfies a real world use case of the server.
 ├── client - contains a lightweight client that can send offers to the server.
 │   ├── cmd - contains the main function of the client
