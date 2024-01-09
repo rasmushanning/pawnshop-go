@@ -4,7 +4,7 @@
 [![Tests](https://github.com/rasmushanning/pawnshop-go/actions/workflows/tests.yml/badge.svg)](https://github.com/rasmushanning/pawnshop-go/actions/workflows/tests.yml) [![CI](https://github.com/rasmushanning/pawnshop-go/actions/workflows/ci.yml/badge.svg)](https://github.com/rasmushanning/pawnshop-go/actions/workflows/ci.yml)
 
 <p align="center">
-  <img style="border: 5px solid white; border-radius: 10px;" src="./assets/pawnshop.png" />
+  <img src="./assets/pawnshop.png" />
 </p>
 
 ## Introduction
