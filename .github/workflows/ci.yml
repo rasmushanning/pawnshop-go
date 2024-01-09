@@ -1,4 +1,4 @@
-name: Main workflow
+name: CI workflow
 
 on: 
   push:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   ci:
-    name: 
+    name: Continous integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

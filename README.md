@@ -118,6 +118,6 @@ To run the end-to-end tests, simply run:
 
 `make endtoendtests`
 
-To run both the unit tests and acceptance tests, simply run:
+To run both the unit tests and end-to-end tests, simply run:
 
 `make test`
