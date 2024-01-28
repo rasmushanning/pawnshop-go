@@ -21,8 +21,8 @@ A lightweight client was also created mainly to be used in the end-to-end tests.
 
 ```
 ├── assets - any asset related to the server or repository in any way, i.e. images or text files.
-├── endtoend_tests - contains a test suite that satisfies a real world use case of the server.
-├── client - contains a lightweight client that can send offers to the server.
+├── endtoend_tests - contains a test suite that satisfies a real world use case of the pawn shop server.
+├── client - contains a lightweight client that can send offers to the pawn shop server.
 │   ├── cmd - contains the main function of the client
 │   └── pkg - contains the packages for the client
 ├── server - contains all the code for the pawn shop server.
@@ -53,8 +53,8 @@ This will output a binary called `server` to the `bin` directory.
 
 The server supports two flags when being run standalone:
 
-- **size**: sets the size of the inventory of the pawn shop as described in the assignment. Default value is 2. Minimum value is 1.
-- **loglevel**: sets the log level for the logger used by the server. Default value is "info". Allowed values are ["debug", "info", "warn", "error", "fatal"].
+- **size**: sets the size of the inventory of the pawn shop. Default value is 2. Minimum value is 1.
+- **loglevel**: sets the log level for the logger used by the pawn shop. Default value is "info". Allowed values are ["debug", "info", "warn", "error", "fatal"].
 
 Example:
 
@@ -115,7 +115,7 @@ To run the unit tests, simply run:
 
 `make unittest`
 
-There also exists a suite of end-to-end-tests that test real world functionality. These tests are run sequentially to exactly simulate the steps in the assignment text.
+There also exists a suite of end-to-end-tests that test real world functionality. These tests are run sequentially to simulate a real use case.
 
 To run the end-to-end tests, simply run:
 
