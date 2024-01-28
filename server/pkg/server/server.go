@@ -63,12 +63,12 @@ func New(size int) (*PawnShopServer, error) {
 Starts the server and listens for connections.
 */
 func (p *PawnShopServer) Start() error {
-	listener, err := net.Listen("tcp", p.addr)
+	l, err := net.Listen("tcp", p.addr)
 	if err != nil {
 		return fmt.Errorf("failed to start server: %w", err)
 	}
 
-	p.listener = listener
+	p.listener = l
 
 	// Use a waitgroup to enable graceful shutdown using server.Stop()
 	p.wg.Add(2)
@@ -138,22 +138,22 @@ Supports graceful shutdown.
 func (p *PawnShopServer) handleConnections() {
 	defer p.wg.Done()
 
-	gracefulShutdownWG := sync.WaitGroup{}
+	shutdownWG := sync.WaitGroup{}
 
 	for {
 		select {
 		case <-p.shutdown:
 			log.Debug("handleConnections received shutdown signal, shutting down...")
 			log.Debug("Waiting for all currently handled offers to finish...")
-			gracefulShutdownWG.Wait()
+			shutdownWG.Wait()
 			log.Debug("All current offers have finished, shutting down...")
 			return
 		case conn := <-p.connections:
-			gracefulShutdownWG.Add(1)
+			shutdownWG.Add(1)
 
 			go func() {
 				p.handleConnection(conn)
-				gracefulShutdownWG.Done()
+				shutdownWG.Done()
 			}()
 		}
 	}
@@ -216,12 +216,12 @@ func (p *PawnShopServer) handleOffer(offer messages.Offer) messages.Answer {
 Rejects an offer by writing a reject answer on the connection.
 */
 func rejectOffer(writeConn func([]byte) (n int, err error)) {
-	rejectAnswer := messages.CreateRejectAnswer()
-	rejectAnswerB, err := json.Marshal(rejectAnswer)
+	rejAns := messages.CreateRejectAnswer()
+	rejAnsB, err := json.Marshal(rejAns)
 	if err != nil {
 		log.Errorf("Failed to marshal reject answer: %s", err)
 		return
 	}
 
-	writeConn(rejectAnswerB)
+	writeConn(rejAnsB)
 }

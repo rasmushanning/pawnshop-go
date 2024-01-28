@@ -19,11 +19,11 @@ type Offer struct {
 /*
 Creates a new Offer with the given offer and demand.
 */
-func CreateOffer(offer int, demand int) Offer {
+func CreateOffer(off int, dem int) Offer {
 	return Offer{
 		Code:   PawnCode,
-		Offer:  offer,
-		Demand: demand,
+		Offer:  off,
+		Demand: dem,
 	}
 }
 

@@ -56,14 +56,14 @@ func (i *Inventory) HandleOffer(o messages.Offer) messages.Answer {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	isProfitable, idx := i.isProfitable(o)
-	if !isProfitable {
+	isP, idx := i.isProfitable(o)
+	if !isP {
 		log.Debugf("Offer %+v is not profitable for the inventory, or not possible for the inventory to accept", o)
 		return messages.CreateRejectAnswer()
 	}
 
 	// Hold value to return to client in answer
-	valToReturn := i.items[idx]
+	valToRet := i.items[idx]
 
 	// Replace the item in the inventory that was decided to be the most
 	// profitable to give up, with the received offer
@@ -73,20 +73,20 @@ func (i *Inventory) HandleOffer(o messages.Offer) messages.Answer {
 	// we find the new smallest value and its index to avoid the work of iteratively
 	// finding the smallest value for every new offer
 	if idx == i.smallestValueIndex {
-		newSmallestValue := i.items[0]
-		newSmallestValueIndex := 0
+		newSmValue := i.items[0]
+		newSmValueIdx := 0
 		for j := 1; j < len(i.items); j++ {
-			if i.items[j] < newSmallestValue {
-				newSmallestValue = i.items[j]
-				newSmallestValueIndex = j
+			if i.items[j] < newSmValue {
+				newSmValue = i.items[j]
+				newSmValueIdx = j
 			}
 		}
 		// Cache the new smallest value and its index
-		i.smallestValue = newSmallestValue
-		i.smallestValueIndex = newSmallestValueIndex
+		i.smallestValue = newSmValue
+		i.smallestValueIndex = newSmValueIdx
 	}
 
-	return messages.CreateAcceptedAnswer(valToReturn)
+	return messages.CreateAcceptedAnswer(valToRet)
 }
 
 /*
@@ -119,22 +119,22 @@ func (i *Inventory) isProfitable(o messages.Offer) (bool, int) {
 	// Find the item in the inventory that gives the highest profit.
 	// It must be greater than or equal to the demand, less than the offer,
 	// and provide a greater profit than any other item in the inventory.
-	maxProfitItemVal := math.MaxInt
-	maxProfitItemIdx := -1
+	maxPrItemVal := math.MaxInt
+	maxPrItemIdx := -1
 	for idx := 0; idx < len(i.items); idx++ {
 		item := i.items[idx]
 		if item >= o.Demand && // Satisfies demand
 			o.Offer > item && // Will ensure profit
-			item < maxProfitItemVal { // Is it the best item so far?
-			maxProfitItemVal = item
-			maxProfitItemIdx = idx
+			item < maxPrItemVal { // Is it the best item so far?
+			maxPrItemVal = item
+			maxPrItemIdx = idx
 		}
 	}
 
 	// If no item satisfies the demand and gives profit, the offer is not profitable
-	if maxProfitItemIdx == -1 {
+	if maxPrItemIdx == -1 {
 		return false, 0
 	}
 
-	return true, maxProfitItemIdx
+	return true, maxPrItemIdx
 }

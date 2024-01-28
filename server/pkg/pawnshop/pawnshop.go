@@ -35,14 +35,14 @@ type PawnShop struct {
 /*
 Creates a new PawnShop with the given inventory and an offer validator.
 */
-func NewPawnShop(inventory offerHandler) *PawnShop {
-	offervalidator := newValidator(
+func NewPawnShop(inv offerHandler) *PawnShop {
+	val := newValidator(
 		&ensureProfitRule{},
 	)
 
 	return &PawnShop{
-		inventory: inventory,
-		validator: offervalidator,
+		inventory: inv,
+		validator: val,
 	}
 }
 

@@ -31,7 +31,7 @@ func main() {
 
 	log.SetLevel(logLvl)
 
-	server, err := server.New(*invSize)
+	srv, err := server.New(*invSize)
 	if err != nil {
 		log.Fatalf("Failed to create server: %s", err)
 	}
@@ -43,13 +43,13 @@ func main() {
 	go func() {
 		<-sigs
 		log.Info("Stopping server...")
-		err := server.Stop()
+		err := srv.Stop()
 		if err != nil {
 			log.Errorf("Failed to stop server: %s", err)
 		}
 	}()
 
-	if err := server.Start(); err != nil {
+	if err := srv.Start(); err != nil {
 		log.Fatalf("Failed to start server: %s", err)
 	}
 }
