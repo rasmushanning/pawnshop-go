@@ -1,6 +1,7 @@
 package pawnshop
 
 import (
+	"errors"
 	"pawnshop/server/pkg/messages"
 )
 
@@ -21,17 +22,16 @@ type validator struct {
 /*
 Creates a new validator with the given rules.
 */
-func newValidator(rules ...offerValidationRule) *validator {
-	acceptedRules := []offerValidationRule{}
+func newValidator(rules ...offerValidationRule) (*validator, error) {
 	for _, rule := range rules {
-		if rule != nil {
-			acceptedRules = append(acceptedRules, rule)
+		if rule == nil {
+			return nil, errors.New("validator rules can not be nil")
 		}
 	}
 
 	return &validator{
-		rules: acceptedRules,
-	}
+		rules: rules,
+	}, nil
 }
 
 /*

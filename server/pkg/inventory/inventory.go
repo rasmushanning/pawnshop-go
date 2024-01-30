@@ -31,8 +31,8 @@ type Inventory struct {
 /*
 Creates a new inventory with the given size.
 */
-func NewInventory(size int) *Inventory {
-	items := make([]int, size)
+func NewInventory(sz int) *Inventory {
+	items := make([]int, sz)
 
 	for i := range items {
 		items[i] = defaultItemValue

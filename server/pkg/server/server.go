@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,7 +34,8 @@ type PawnShopServer struct {
 	offerHandler OfferHandler
 	listener     net.Listener
 	connections  chan net.Conn
-	shutdown     chan struct{}
+	shutdownCtx  context.Context
+	cancel       context.CancelFunc
 	wg           sync.WaitGroup
 }
 
@@ -41,20 +43,28 @@ type PawnShopServer struct {
 Creates a new PawnShopServer with the given inventory size.
 If size is less than 1, an error is returned.
 */
-func New(size int) (*PawnShopServer, error) {
-	if size < 1 {
+func NewPawnShopServer(sz int) (*PawnShopServer, error) {
+	if sz < 1 {
 		return nil, errors.New("inventory size must be at least 1")
 	}
 
-	inventory := inventory.NewInventory(size)
+	inv := inventory.NewInventory(sz)
 
-	log.Debugf("Created new pawn shop with an inventory of size %d: %s", size, inventory)
+	pawnshop, err := pawnshop.NewPawnShop(inv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new PawnShop, %w", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	log.Debugf("Created new pawn shop with an inventory of size %d: %s", sz, inv)
 	return &PawnShopServer{
 		addr:         addr,
 		isRunning:    false,
-		offerHandler: pawnshop.NewPawnShop(inventory),
+		offerHandler: pawnshop,
 		connections:  make(chan net.Conn),
-		shutdown:     make(chan struct{}),
+		shutdownCtx:  ctx,
+		cancel:       cancel,
 		wg:           sync.WaitGroup{},
 	}, nil
 }
@@ -90,9 +100,8 @@ Returns an error if the listener could not be closed.
 */
 func (p *PawnShopServer) Stop() error {
 	p.isRunning = false
-	if p.shutdown != nil {
-		close(p.shutdown)
-	}
+	p.cancel()
+
 	if p.listener != nil {
 		if err := p.listener.Close(); err != nil {
 			return fmt.Errorf("failed to close listener: %w", err)
@@ -120,7 +129,7 @@ func (p *PawnShopServer) acceptConnections() {
 		conn, err := p.listener.Accept()
 		if err != nil {
 			select {
-			case <-p.shutdown:
+			case <-p.shutdownCtx.Done():
 				log.Debug("acceptConnections received shutdown signal, shutting down...")
 				return
 			default:
@@ -138,22 +147,22 @@ Supports graceful shutdown.
 func (p *PawnShopServer) handleConnections() {
 	defer p.wg.Done()
 
-	shutdownWG := sync.WaitGroup{}
+	connsWG := sync.WaitGroup{}
 
 	for {
 		select {
-		case <-p.shutdown:
+		case <-p.shutdownCtx.Done():
 			log.Debug("handleConnections received shutdown signal, shutting down...")
 			log.Debug("Waiting for all currently handled offers to finish...")
-			shutdownWG.Wait()
+			connsWG.Wait()
 			log.Debug("All current offers have finished, shutting down...")
 			return
 		case conn := <-p.connections:
-			shutdownWG.Add(1)
+			connsWG.Add(1)
 
 			go func() {
 				p.handleConnection(conn)
-				shutdownWG.Done()
+				connsWG.Done()
 			}()
 		}
 	}
@@ -163,10 +172,10 @@ func (p *PawnShopServer) handleConnections() {
 Reads an offer from a connection, handles it and writes the answer back on the connection.
 */
 func (p *PawnShopServer) handleConnection(conn net.Conn) {
-	buffer := make([]byte, bufSize)
+	buf := make([]byte, bufSize)
 
 	var n int
-	n, err := conn.Read(buffer)
+	n, err := conn.Read(buf)
 	if err != nil {
 		if !errors.Is(err, io.EOF) {
 			log.Errorf("Failed to read from connection: %s", err)
@@ -174,7 +183,7 @@ func (p *PawnShopServer) handleConnection(conn net.Conn) {
 		return
 	}
 
-	offB := buffer[:n]
+	offB := buf[:n]
 
 	var off messages.Offer
 	if err = json.Unmarshal(offB, &off); err != nil {

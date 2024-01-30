@@ -16,7 +16,7 @@ and prints the results to stdout. It begins with an inventory size of 5.
 */
 func TestSequentialEndToEndTests(t *testing.T) {
 	invSz := 5
-	srv, err := server.New(invSz)
+	srv, err := server.NewPawnShopServer(invSz)
 	require.NoError(t, err)
 
 	go func() {

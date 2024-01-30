@@ -5,7 +5,7 @@ import (
 	"pawnshop/server/pkg/mocks"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
 
@@ -62,8 +62,9 @@ func TestHandleOffer(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			c.expectations()
 
-			shop := NewPawnShop(mockOfferHandler)
-			assert.Equal(t, c.expected, shop.HandleOffer(c.offer))
+			shop, err := NewPawnShop(mockOfferHandler)
+			require.NoError(t, err)
+			require.Equal(t, c.expected, shop.HandleOffer(c.offer))
 		})
 	}
 }
