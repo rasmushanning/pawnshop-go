@@ -7,6 +7,46 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNewValidator(t *testing.T) {
+	cases := []struct {
+		name     string
+		offer    messages.Offer
+		rules    []offerValidationRule
+		expError bool
+	}{
+		{
+			name: "ensureProfitRule - should not return error",
+			rules: []offerValidationRule{
+				&ensureProfitRule{},
+			},
+			expError: false,
+		},
+		{
+
+			name: "nil rule - should fail creating validator - should return error",
+			rules: []offerValidationRule{
+				nil,
+			},
+			expError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			validator, err := newValidator(
+				c.rules...,
+			)
+			if c.expError {
+				require.Nil(t, validator)
+				require.Error(t, err)
+			} else {
+				require.NotNil(t, validator)
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
 func TestValidate(t *testing.T) {
 	cases := []struct {
 		name     string
@@ -37,27 +77,16 @@ func TestValidate(t *testing.T) {
 			},
 			expError: true,
 		},
-		{
-
-			name: "nil rule - will not count as a rule, should not return error",
-			offer: messages.Offer{
-				Offer:  2,
-				Demand: 3,
-			},
-			rules: []offerValidationRule{
-				nil,
-			},
-			expError: false,
-		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			validator := newValidator(
+			validator, err := newValidator(
 				c.rules...,
 			)
+			require.NoError(t, err)
 
-			err := validator.validate(c.offer)
+			err = validator.validate(c.offer)
 			if c.expError {
 				require.Error(t, err)
 			} else {

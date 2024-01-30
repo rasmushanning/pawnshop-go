@@ -12,8 +12,8 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	invSize := 2
-	s := startServerAndWait(t, invSize)
+	invSz := 2
+	s := startServerAndWait(t, invSz)
 	defer func() {
 		err := s.Stop()
 		require.NoError(t, err)
@@ -115,7 +115,7 @@ func TestServerErrors(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			s, err := New(c.size)
+			s, err := NewPawnShopServer(c.size)
 			if c.expNewError {
 				require.Error(t, err)
 				return
@@ -138,7 +138,7 @@ func TestServerErrors(t *testing.T) {
 }
 
 func startServerAndWait(t *testing.T, size int) *PawnShopServer {
-	s, err := New(size)
+	s, err := NewPawnShopServer(size)
 	require.NoError(t, err)
 
 	availablePort, err := getAvailablePort()

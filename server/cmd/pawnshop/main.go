@@ -23,17 +23,15 @@ func main() {
 
 	logLvl, err := log.ParseLevel(*logLvlStr)
 	if err != nil {
-		log.Warnf("Failed to parse log level: %s, using InfoLevel instead", err)
-		logLvl = log.InfoLevel
-	} else {
-		log.Infof("Using log level %s", logLvl)
+		log.Fatalf("Failed to parse log level: %s", err)
 	}
 
+	log.Infof("Using log level %s", logLvl)
 	log.SetLevel(logLvl)
 
-	srv, err := server.New(*invSize)
+	srv, err := server.NewPawnShopServer(*invSize)
 	if err != nil {
-		log.Fatalf("Failed to create server: %s", err)
+		log.Fatalf("Failed to create new server: %s", err)
 	}
 
 	sigs := make(chan os.Signal, 1)

@@ -35,15 +35,18 @@ type PawnShop struct {
 /*
 Creates a new PawnShop with the given inventory and an offer validator.
 */
-func NewPawnShop(inv offerHandler) *PawnShop {
-	val := newValidator(
+func NewPawnShop(inv offerHandler) (*PawnShop, error) {
+	val, err := newValidator(
 		&ensureProfitRule{},
 	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create validator, %w", err)
+	}
 
 	return &PawnShop{
 		inventory: inv,
 		validator: val,
-	}
+	}, nil
 }
 
 /*
